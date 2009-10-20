@@ -1,0 +1,30 @@
+<h1>Listing races</h1>
+
+<table>
+  <tr>
+    <th>Term1</th>
+    <th>Term2</th>
+    <th>Count 1</th>
+    <th>Count 2</th>
+    <th>Race To</th>
+    <th>Winner</th>
+  </tr>
+
+<% @races.each do |race| %>
+  <tr>
+    <td><%=h race.term1 %></td>
+    <td><%=h race.term2 %></td>
+    <td><%=h race.count1 %></td>
+    <td><%=h race.count2 %></td>
+    <td><%=h race.race_to %></td>
+    <td><font color="green"><%=h race.winner %></td>
+    <td><%= link_to 'Show', race %></td>
+    <!-- <td><%= link_to 'Edit', edit_race_path(race) %></td> -->
+    <!-- <td><%= link_to 'Destroy', race, :confirm => 'Are you sure?', :method => :delete %></td> -->
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New race', new_race_path %>

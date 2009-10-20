@@ -1,0 +1,36 @@
+<p>
+  <b>Term1:</b>
+  <%=h @race.term1 %>
+</p>
+
+<p>
+  <b>Term2:</b>
+  <%=h @race.term2 %>
+</p>
+
+<p>
+  <b>Count1:</b>
+  <%=h @race.count1 %>
+</p>
+
+<p>
+  <b>Count2:</b>
+  <%=h @race.count2 %>
+</p>
+<p>
+  <b>Race To:</b>
+  <%=h @race.race_to %>
+</p>
+
+<h1><%=h @race.term1 %></h1>
+<% @tweets1.each do |tweet| %>
+  <b><%= tweet.from_user %></b>: <%=h tweet.text %><br />
+<% end %>
+
+<h1><%=h @race.term2 %></h1>
+<% @tweets2.each do |tweet| %>
+  <b><%= tweet.from_user %></b>: <%=h tweet.text %><br />
+<% end %>
+
+<%= link_to 'All races', races_path %> |
+<%= link_to 'New race', new_race_path %>
