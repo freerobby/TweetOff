@@ -1,30 +1,63 @@
-<h1>Listing races</h1>
+<ul>
+  <li><b>bold</b> listings are active.</li>
+  <li><font color="green">green</font> designates a winner.</li>
+  <li><font color="orange">orange</font> designates a tie.</li>
+</ul>
 
-<table>
+<%= will_paginate @races %>
+
+<table border="1px" width="100%">
   <tr>
     <th>Term1</th>
+    <th></th>
     <th>Term2</th>
-    <th>Count 1</th>
-    <th>Count 2</th>
     <th>Race To</th>
-    <th>Winner</th>
+    <th>Began </th>
+    <th>Ended</th>
+    <th>Duration</th>
   </tr>
 
 <% @races.each do |race| %>
+<%
+  color1 = "black"
+  color2 = "black"
+  color1 = "green" if race.winner == 1
+  color1 = "orange" if race.winner == 0
+  color2 = "green" if race.winner == 2
+  color2 = "orange" if race.winner == 0
+%>
   <tr>
-    <td><%=h race.term1 %></td>
-    <td><%=h race.term2 %></td>
-    <td><%=h race.count1 %></td>
-    <td><%=h race.count2 %></td>
-    <td><%=h race.race_to %></td>
-    <td><font color="green"><%=h race.winner %></td>
+    <td>
+      <font color="<%= color1 %>">
+      <% if !race.complete? %>
+        <b>
+      <% end %>
+      <%=h race.term1 %> (<%= race.count1 %>)
+      <% if !race.complete? %>
+        </b>
+      <% end %>
+      </font>
+    </td>
+    <td>vs.</td>
+    <td>
+      <font color="<%= color2 %>">
+      <% if !race.complete? %>
+        <b>
+      <% end %>
+      <%=h race.term2 %> (<%= race.count2 %>)
+      <% if !race.complete? %>
+        </b>
+      <% end %>
+      </font>
+    </td>
+
+    <td><%=h race.race_to %></td> 
+    <td><%= time_ago_in_words race.began_at %> ago</td>
+    <td><%= ((time_ago_in_words race.ended_at) + " ago") if race.complete? %></td>
+    <td><%= distance_of_time_in_words race.duration %></td>
     <td><%= link_to 'Show', race %></td>
     <!-- <td><%= link_to 'Edit', edit_race_path(race) %></td> -->
     <!-- <td><%= link_to 'Destroy', race, :confirm => 'Are you sure?', :method => :delete %></td> -->
   </tr>
 <% end %>
 </table>
-
-<br />
-
-<%= link_to 'New race', new_race_path %>
