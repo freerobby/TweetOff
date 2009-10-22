@@ -23,13 +23,17 @@
 </p>
 
 <h1><%=h @race.term1 %></h1>
-<% @tweets1.each do |tweet| %>
-  <b><%= tweet.from_user %></b>: <%=h tweet.text %><br />
+<% @race.twitter_tweets.each do |t| %>
+  <% if t.term == 1 %>
+    <b><%= t.author %></b>: <%=h t.text %><br />
+  <% end %>
 <% end %>
 
 <h1><%=h @race.term2 %></h1>
-<% @tweets2.each do |tweet| %>
-  <b><%= tweet.from_user %></b>: <%=h tweet.text %><br />
+<% @race.twitter_tweets.each do |t| %>
+<% if t.term == 2 %>
+  <b><%= t.author %></b>: <%=h t.text %><br />
+<% end %>
 <% end %>
 
 <%= link_to 'All races', races_path %> |

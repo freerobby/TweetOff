@@ -41,26 +41,4 @@ class RacesControllerTest < ActionController::TestCase
     should_respond_with :success
     should_render_template :edit
   end
-  # context "on PUT to :update" do
-  #   setup do
-  #     @id = Factory(:race).id
-  #     put :update, :id => @id, :race => {:count1 => 3}
-  #   end
-  #   # should_redirect_to "/races/#{Factory(:race).id}/show"
-  #   should_respond_with :redirect
-  #   should "keep the updated data" do
-  #     assert Race.find(@id).count1 == 3
-  #   end
-  # end
-  # context "on DELETE to :destroy" do
-  #   setup do
-  #     @id = Factory(:race).id
-  #     post :destroy, :id => @id
-  #   end
-  #   should "delete the object" do
-  #     assert_raises ActiveRecord::RecordNotFound do
-  #       Race.find(@id)
-  #     end
-  #   end
-  # end
 end

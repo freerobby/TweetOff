@@ -63,33 +63,4 @@ class RacesController < ApplicationController
       end
     end
   end
-
-  # PUT /races/1
-  # PUT /races/1.xml
-  # def update
-  #   @race = Race.find(params[:id])
-  # 
-  #   respond_to do |format|
-  #     if @race.update_attributes(params[:race])
-  #       flash[:notice] = 'Race was successfully updated.'
-  #       format.html { redirect_to(@race) }
-  #       format.xml  { head :ok }
-  #     else
-  #       format.html { render :action => "edit" }
-  #       format.xml  { render :xml => @race.errors, :status => :unprocessable_entity }
-  #     end
-  #   end
-  # end
-
-  # DELETE /races/1
-  # DELETE /races/1.xml
-  # def destroy
-  #   @race = Race.find(params[:id])
-  #   @race.destroy
-  # 
-  #   respond_to do |format|
-  #     format.html { redirect_to(races_url) }
-  #     format.xml  { head :ok }
-  #   end
-  # end
 end
