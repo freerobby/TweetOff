@@ -50,23 +50,20 @@ pageTracker._trackPageview();
 } catch(err) {}</script>
 <script type="text/javascript">
   var uservoiceJsHost = ("https:" == document.location.protocol) ? "https://uservoice.com" : "http://cdn.uservoice.com";
-  document.write(unescape("%3Cscript src='" + uservoiceJsHost + "/javascripts/widgets/interactive/embed.js' type='text/javascript'%3E%3C/script%3E"))
+  document.write(unescape("%3Cscript src='" + uservoiceJsHost + "/javascripts/widgets/tab.js' type='text/javascript'%3E%3C/script%3E"))
 </script>
 <script type="text/javascript">
-  /* See Single Sign-On Setup */
-  UserVoice.User.setToken('wWENsvxKcvS1S36%2Ft9wqKjcWIRlneKM6UM0jmHToST1HuXl1kgVRmjJddfcs7nNJzjAlun9TS%2BQq3ZqBqbVgb7N2OKbizm3W7k5Ar01zGcsoIMgZT2ZShN29pBUzX49dHflYd8%2FzMG4eRHUJzqxTNQz%2FmhqRdC6ZtDbM3Vgnt9%2Bzf8e4%2BvSC%2FOAgTGo0BPtydkn4LM%2Bcw41hZzj0a80%2FkNZp2s0J%2FY4umbcYHqRCoLncXMEjUrontHQGqKgGb3i0xq3MkNI2S603wvJNIHeKAeLQVXBjcXJ%2F6YDTiHja6OzDEf4pzUqlHZOpDQWfw0co5Y97u34LzwK5LXc9xsYV8w%3D%3D'); 
-  
-  UserVoice.Widget.tab({ 
-    /* required */
-    subdomain: 'tweetoff',
-    forum_id: '31922',
-    /* optional */
-    components: ['welcome', 'ideas', 'bugs'],
-    alignment: 'right',
-    background_color:'#06C', 
-    text_color: 'white',
-    hover_color: '#037',
-    lang: 'en'    
-  })
+UserVoice.Tab.show({ 
+  /* required */
+  key: 'tweetoff',
+  host: 'tweetoff.uservoice.com', 
+  forum: '31922', 
+  /* optional */
+  alignment: 'right',
+  background_color:'#06C', 
+  text_color: 'white',
+  hover_color: '#037',
+  lang: 'en'
+})
 </script>
 </html>
