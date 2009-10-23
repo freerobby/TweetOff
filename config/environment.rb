@@ -22,6 +22,7 @@ Rails::Initializer.run do |config|
   config.gem "dancroak-twitter-search", :lib => "twitter_search", :version => '0.5.8', :source => "http://gems.github.com"
   config.gem "will_paginate", :version => '2.3.11', :source => "http://gemcutter.org"
   config.gem "searchlogic", :version => '2.3.5', :source => "http://gemcutter.org"
+  config.gem "twitter", :version => '0.6.15', :source => "http://gemcutter.org"
   
   
   if RAILS_ENV != "production"

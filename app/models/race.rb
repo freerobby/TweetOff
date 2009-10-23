@@ -1,6 +1,8 @@
 include TwitterSearch
+include ActionView::Helpers::DateHelper
 
 class Race < ActiveRecord::Base
+  
   has_many :twitter_tweets
   default_scope :order => "created_at DESC"
   
@@ -76,6 +78,24 @@ class Race < ActiveRecord::Base
   end
   
   private
+  def generate_twitter_status
+    if winner == 0
+      "It's a draw! " + self.term1 + " and " + self.term2 + " both got " + count1.to_s + " mentions in " + (distance_of_time_in_words duration) + ". #tweetoff"
+    elsif winner == 1
+      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions and bested " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". #tweetoff"
+    else # winner == 2
+      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions and bested " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". #tweetoff"
+    end
+  end
+  
+  def post_to_twitter
+    if RAILS_ENV == "production"
+      httpauth = Twitter::HTTPAuth.new("therealrobby@robbygrossman.com", "8csZNX2PZBzALc")
+      client = Twitter::Base.new(httpauth)
+      client.update(generate_twitter_status)
+    end
+  end
+  
   # If we find too many results in a single pull, clean up accordingly for accurate results.
   def cleanup
     remove_tweets_past_finish_line if count1 > race_to || count2 > race_to
@@ -169,5 +189,6 @@ class Race < ActiveRecord::Base
       self.save!
     end
     cleanup if complete?
+    post_to_twitter if complete?
   end
 end
