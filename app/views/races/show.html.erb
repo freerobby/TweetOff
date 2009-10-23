@@ -1,18 +1,16 @@
-<h1><%= @race.term1 %> vs <%= @race.term2 %></h1>
-
 <% if !@race.complete? %>
   <h3>First to <%= @race.race_to %> wins.</h3>
-  <p>This race has not ended! This page will refresh automatically!</p>
+  <p>Race in progress. This page will refresh automatically!</p>
 <% else %>
-  <p><em><%= @race.winning_term %></em> is the winner!</p>
+  <p><h1><em><%= @race.winning_term %></em> is the winner!</h1></p>
 <% end %>
 
 <table width="100%">
   <tr>
-    <td align="center" valign="middle">
+    <td align="center" valign="middle" width="50%">
       <h2><%= @race.term1 %> (<%= @race.count1 %> tweets)</h2>
     </td>
-    <td align="center" valign="middle">
+    <td align="center" valign="middle" width="50%">
       <h2><%= @race.term2 %> (<%= @race.count2 %> tweets)</h2>
     </td>
   </tr>
@@ -21,7 +19,7 @@
       <ol>
       <% @race.twitter_tweets.all(:order => "twitter_id ASC").each do |t| %>
         <% if t.term == 1 %>
-          <li>[<a href="http://twitter.com/<%= t.author %>/status/<%= t.twitter_id %>">link</a>] <a href="http://twitter.com/<%= t.author %>"><b>@<%= t.author %></b></a>: <%= t.text %> <!-- (<%=h t.tweeted_at %>) --></li>
+          <li><a href="http://twitter.com/<%= t.author %>" target="_blank"><b>@<%= t.author %></b></a>: <%= t.text %> [<a href="http://twitter.com/<%= t.author %>/status/<%= t.twitter_id %>" target="_blank">link</a>]<!-- (<%=h t.tweeted_at %>) --></li>
         <% end %>
       <% end %>
       </ol>
@@ -30,7 +28,7 @@
       <ol>
       <% @race.twitter_tweets.all(:order => "twitter_id ASC").each do |t| %>
         <% if t.term == 2 %>
-          <li>[<a href="http://twitter.com/<%= t.author %>/status/<%= t.twitter_id %>">link</a>] <a href="http://twitter.com/<%= t.author %>"><b>@<%= t.author %></b></a>: <%= t.text %> <!-- (<%=h t.tweeted_at %>) --></li>
+          <li><a href="http://twitter.com/<%= t.author %>" target="_blank"><b>@<%= t.author %></b></a>: <%= t.text %> [<a href="http://twitter.com/<%= t.author %>/status/<%= t.twitter_id %>" target="_blank">link</a>]<!-- (<%=h t.tweeted_at %>) --></li>
         <% end %>
       <% end %>
       </ol>
