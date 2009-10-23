@@ -180,8 +180,8 @@ class Race < ActiveRecord::Base
         end
       end
       
-      lta1 = self.twitter_tweets.find_by_term(1, :order => "tweeted_at DESC")
-      lta2 = self.twitter_tweets.find_by_term(2, :order => "tweeted_at DESC")
+      lta1 = self.twitter_tweets.find_by_term(1, :order => "twitter_id DESC")
+      lta2 = self.twitter_tweets.find_by_term(2, :order => "twitter_id DESC")
       self.last_tweet1 = lta1.twitter_id.to_s if !lta1.nil?
       self.last_tweet2 = lta2.twitter_id.to_s if !lta2.nil?
       self.save!
