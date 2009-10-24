@@ -26,3 +26,8 @@ config.action_view.cache_template_loading            = true
 
 # Enable threaded mode
 # config.threadsafe!
+
+APP_BASE = "http://tweetoff.freerobby.com"
+
+TWITTER_EMAIL = "therealrobby@robbygrossman.com"
+TWITTER_PASSWORD = "8csZNX2PZBzALc"

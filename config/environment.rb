@@ -49,3 +49,6 @@ Rails::Initializer.run do |config|
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
 end
+
+BITLY_USER = "freerobby"
+BITLY_APIKEY = "R_99cd350dcf88511ebcbdd46a35cd5f0a"

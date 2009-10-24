@@ -15,3 +15,8 @@ config.action_controller.perform_caching             = false
 
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
+
+APP_BASE = "http://localhost:3000"
+
+TWITTER_EMAIL = "realrobby@gmail.com"
+TWITTER_PASSWORD = "aoT6DHb5rtYpdw"

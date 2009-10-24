@@ -26,3 +26,8 @@ config.action_mailer.delivery_method = :test
 # This is necessary if your schema can't be completely dumped by the schema dumper,
 # like if you have constraints or database-specific column types
 # config.active_record.schema_format = :sql
+
+APP_BASE = "http://localhost:3000"
+
+TWITTER_EMAIL = "realrobby@gmail.com"
+TWITTER_PASSWORD = "aoT6DHb5rtYpdw"
