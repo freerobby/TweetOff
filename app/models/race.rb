@@ -1,3 +1,4 @@
+require "bitly"
 include TwitterSearch
 include ActionView::Helpers::DateHelper
 
@@ -77,14 +78,19 @@ class Race < ActiveRecord::Base
     ended_at - began_at
   end
   
+  def link_to_show
+    @bitly = ::Bitly.new("freerobby", "R_99cd350dcf88511ebcbdd46a35cd5f0a")
+    @bitly.shorten("http://tweetoff.freerobby.com/races/" + self.id.to_s).short_url
+  end
+  
   private
   def generate_twitter_status
     if winner == 0
-      "It's a draw! " + self.term1 + " and " + self.term2 + " both got " + count1.to_s + " mentions in " + (distance_of_time_in_words duration) + ". #tweetoff"
+      "It's a draw! " + self.term1 + " and " + self.term2 + " both got " + count1.to_s + " mentions in " + (distance_of_time_in_words duration) + ". " + link_to_show
     elsif winner == 1
-      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions and bested " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". #tweetoff"
+      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions and bested " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". " + link_to_show
     else # winner == 2
-      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions and bested " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". #tweetoff"
+      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions and bested " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". " + link_to_show
     end
   end
   
@@ -92,7 +98,11 @@ class Race < ActiveRecord::Base
     if RAILS_ENV == "production"
       httpauth = Twitter::HTTPAuth.new("therealrobby@robbygrossman.com", "8csZNX2PZBzALc")
       client = Twitter::Base.new(httpauth)
-      client.update(generate_twitter_status)
+      client.update(generate_twitter_status, {:source => '<a href="http://tweetoff.freerobby.com">TweetOff!</a>'})
+    else
+      httpauth = Twitter::HTTPAuth.new("realrobby@gmail.com", "aoT6DHb5rtYpdw")
+      client = Twitter::Base.new(httpauth)
+      client.update(generate_twitter_status, {:source => '<a href="http://tweetoff.freerobby.com">TweetOff!</a>'})
     end
   end
   

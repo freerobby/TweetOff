@@ -23,7 +23,7 @@ Rails::Initializer.run do |config|
   config.gem "will_paginate", :version => '2.3.11', :source => "http://gemcutter.org"
   config.gem "searchlogic", :version => '2.3.5', :source => "http://gemcutter.org"
   config.gem "twitter", :version => '0.6.15', :source => "http://gemcutter.org"
-  
+  config.gem "bitly", :version => '0.3.1', :source => "http://gemcutter.org"
   
   if RAILS_ENV != "production"
     config.gem "thoughtbot-shoulda", :lib => "shoulda", :source => "http://gems.github.com"
