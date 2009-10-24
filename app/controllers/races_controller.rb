@@ -50,7 +50,7 @@ class RacesController < ApplicationController
 
     respond_to do |format|
       if @race.save
-        flash[:notice] = 'Race was successfully created.'
+        #flash[:notice] = 'Race was successfully created.'
         format.html { redirect_to(@race) }
         format.xml  { render :xml => @race, :status => :created, :location => @race }
       else
