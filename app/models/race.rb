@@ -1,5 +1,4 @@
 require "bitly"
-include TwitterSearch
 include ActionView::Helpers::DateHelper
 
 class Race < ActiveRecord::Base
@@ -9,9 +8,9 @@ class Race < ActiveRecord::Base
   
   validates_presence_of :term1
   validates_presence_of :term2
-  validates_numericality_of :last_tweet1, :only_integer => true, :allow_nil => false
-  validates_numericality_of :last_tweet2, :only_integer => true, :allow_nil => false
-  validates_numericality_of :race_to, :only_integer => true
+  validates_numericality_of :last_tweet1, :allow_nil => false #, :only_integer => true
+  validates_numericality_of :last_tweet2, :allow_nil => false #, :only_integer => true
+  validates_numericality_of :race_to, :only_integer =>  true
   
   after_create :initialize_last_tweets
   
@@ -122,8 +121,8 @@ class Race < ActiveRecord::Base
   def remove_extras
     # Find out when the race was won, and remove any tweets from the loser that came after that.
     if winner > 0
-      won_at = self.twitter_tweets.find_by_term(winner, :order => "tweeted_at DESC").twitter_id
-      extras = self.twitter_tweets.term_equals(loser).twitter_id_greater_than(won_at).all(:order => "tweeted_at DESC")
+      won_at = self.twitter_tweets.find_by_term(winner, :order => "twitter_id DESC").twitter_id
+      extras = self.twitter_tweets.twitter_id_greater_than(won_at)
       extras.each do |e|
         e.destroy
       end
@@ -137,7 +136,7 @@ class Race < ActiveRecord::Base
       num_extra_terms = count1 - self.race_to if winner == 1
       num_extra_terms = count2 - self.race_to if winner == 2
       
-      deletable1s = self.twitter_tweets.find_all_by_term(winner, :order => "tweeted_at DESC", :limit => num_extra_terms)
+      deletable1s = self.twitter_tweets.find_all_by_term(winner, :order => "twitter_id DESC", :limit => num_extra_terms)
       deletable1s.each do |t|
         t.destroy
       end
@@ -146,48 +145,59 @@ class Race < ActiveRecord::Base
   end
   
   def initialize_last_tweets
-    client = TwitterSearch::Client.new('TweetOff!')
-    last_tweet_with_term1 = client.query :q => self.term1, :rpp => 1
-    last_tweet_with_term2 = client.query :q => self.term2, :rpp => 1
-    if !last_tweet_with_term1.empty?
-      self.last_tweet1 = last_tweet_with_term1.first.id
+    httpauth = Twitter::HTTPAuth.new(TWITTER_EMAIL, TWITTER_PASSWORD)
+    client = Twitter::Base.new(httpauth)
+    term1_tweets = Twitter::Search.new(self.term1).per_page(1).fetch().results
+    term2_tweets = Twitter::Search.new(self.term2).per_page(1).fetch().results
+    if term1_tweets.size > 0
+      self.last_tweet1 = term1_tweets.first.id.to_s
+    else
+      self.last_tweet1 = 0
     end
-    if !last_tweet_with_term2.empty?
-      self.last_tweet2 = last_tweet_with_term2.first.id
+    if term2_tweets.size > 0
+      self.last_tweet2 = term2_tweets.first.id.to_s
+    else
+      self.last_tweet2 = 0
     end
     self.save!
   end
   # ToDo: Only update if it's been at least delay seconds.
   def update_status
     begin
-      client = TwitterSearch::Client.new('TweetOff!')
+      puts "Updating Status..."
+      httpauth = Twitter::HTTPAuth.new(TWITTER_EMAIL, TWITTER_PASSWORD)
+      client = Twitter::Base.new(httpauth)
       max_results1 = self.race_to - count1
       max_results2 = self.race_to - count2
-      query1 = {:q => self.term1, :since_id => self.last_tweet1.to_s, :rpp => max_results1, :page => 1}
-      query2 = {:q => self.term2, :since_id => self.last_tweet2.to_s, :rpp => max_results2, :page => 1}
-      newTweets1 = client.query query1
-      newTweets2 = client.query query2
+      puts "Max Results 1: " + max_results1.to_s
+      puts "Max Results 2: " + max_results2.to_s
     
-      # Store the tweets
-      newTweets1.each do |t|
-        # This if should not be necessary, but it is. Figure out why.
-        if self.twitter_tweets.find_by_term_and_twitter_id(1, t.id).nil?
+      # Store the tweets\
+      puts "Term 1: " + self.term1
+      puts "Last Tweet 1: " + self.last_tweet1.to_s
+      search1 = Twitter::Search.new(self.term1).since(self.last_tweet1).per_page(max_results1).page(1).fetch().results
+      if !search1.nil?
+        search1.each do |t|
+          puts "  Result: " + t.inspect
           self.twitter_tweets.build(:text => t.text, :twitter_id => t.id, :author => t.from_user, :term => 1, :tweeted_at => t.created_at)
         end
       end
-      newTweets2.each do |t|
-        # This if should not be necessary, but it is. Figure out why.
-        if self.twitter_tweets.find_by_term_and_twitter_id(2, t.id).nil?
+      puts "Term 2: " + self.term2
+      puts "Last Tweet 2: " + self.last_tweet2.to_s
+      search2 = Twitter::Search.new(self.term2).since(self.last_tweet2).per_page(max_results2).page(1).fetch().results
+      if !search2.nil?
+        search2.each do |t|
+          puts "  Result: " + t.inspect
           self.twitter_tweets.build(:text => t.text, :twitter_id => t.id, :author => t.from_user, :term => 2, :tweeted_at => t.created_at)
         end
       end
-      
-      lta1 = self.twitter_tweets.find_by_term(1, :order => "twitter_id DESC")
-      lta2 = self.twitter_tweets.find_by_term(2, :order => "twitter_id DESC")
+      self.save!
+      lta1 = self.twitter_tweets.term_equals(1).descend_by_twitter_id.first
+      lta2 = self.twitter_tweets.term_equals(2).descend_by_twitter_id.first
       self.last_tweet1 = lta1.twitter_id if !lta1.nil?
       self.last_tweet2 = lta2.twitter_id if !lta2.nil?
       self.save!
-    rescue TwitterSearch::SearchServerError => e
+    rescue Twitter::TwitterError => e
       self.save!
     end
     cleanup if complete?

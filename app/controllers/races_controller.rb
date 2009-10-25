@@ -1,5 +1,3 @@
-require 'twitter_search'
-
 class RacesController < ApplicationController
   # GET /races
   # GET /races.xml
