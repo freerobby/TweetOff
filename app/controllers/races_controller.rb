@@ -16,7 +16,6 @@ class RacesController < ApplicationController
   # GET /races/1.xml
   def show
     @race = Race.find(params[:id])
-    @race.go!
 
     respond_to do |format|
       format.html # show.html.erb
