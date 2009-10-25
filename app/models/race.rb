@@ -9,10 +9,8 @@ class Race < ActiveRecord::Base
   
   validates_presence_of :term1
   validates_presence_of :term2
-  validates_presence_of :last_tweet1
-  validates_presence_of :last_tweet2
-  validates_numericality_of :count1, :only_integer => true
-  validates_numericality_of :count2, :only_integer => true
+  validates_numericality_of :last_tweet1, :only_integer => true, :allow_nil => false
+  validates_numericality_of :last_tweet2, :only_integer => true, :allow_nil => false
   validates_numericality_of :race_to, :only_integer => true
   
   after_create :initialize_last_tweets
@@ -57,7 +55,7 @@ class Race < ActiveRecord::Base
   def count2
     self.twitter_tweets.find_all_by_term(2).size
   end
-  
+    
   def complete?
     count1 >= self.race_to || count2 >= self.race_to
   end
@@ -152,10 +150,10 @@ class Race < ActiveRecord::Base
     last_tweet_with_term1 = client.query :q => self.term1, :rpp => 1
     last_tweet_with_term2 = client.query :q => self.term2, :rpp => 1
     if !last_tweet_with_term1.empty?
-      self.last_tweet1 = last_tweet_with_term1.first.id.to_s
+      self.last_tweet1 = last_tweet_with_term1.first.id
     end
     if !last_tweet_with_term2.empty?
-      self.last_tweet2 = last_tweet_with_term2.first.id.to_s
+      self.last_tweet2 = last_tweet_with_term2.first.id
     end
     self.save!
   end
@@ -163,10 +161,10 @@ class Race < ActiveRecord::Base
   def update_status
     begin
       client = TwitterSearch::Client.new('TweetOff!')
-      max_results1 = self.race_to - self.count1
-      max_results2 = self.race_to - self.count2
-      query1 = {:q => self.term1, :since_id => self.last_tweet1, :rpp => max_results1, :page => 1}
-      query2 = {:q => self.term2, :since_id => self.last_tweet2, :rpp => max_results2, :page => 1}
+      max_results1 = self.race_to - count1
+      max_results2 = self.race_to - count2
+      query1 = {:q => self.term1, :since_id => self.last_tweet1.to_s, :rpp => max_results1, :page => 1}
+      query2 = {:q => self.term2, :since_id => self.last_tweet2.to_s, :rpp => max_results2, :page => 1}
       newTweets1 = client.query query1
       newTweets2 = client.query query2
     
@@ -186,8 +184,8 @@ class Race < ActiveRecord::Base
       
       lta1 = self.twitter_tweets.find_by_term(1, :order => "twitter_id DESC")
       lta2 = self.twitter_tweets.find_by_term(2, :order => "twitter_id DESC")
-      self.last_tweet1 = lta1.twitter_id.to_s if !lta1.nil?
-      self.last_tweet2 = lta2.twitter_id.to_s if !lta2.nil?
+      self.last_tweet1 = lta1.twitter_id if !lta1.nil?
+      self.last_tweet2 = lta2.twitter_id if !lta2.nil?
       self.save!
     rescue TwitterSearch::SearchServerError => e
       self.save!

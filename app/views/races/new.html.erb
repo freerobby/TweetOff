@@ -12,14 +12,6 @@
           <%= f.label "Query 2" %>: 
           <%= f.text_field :term2 %>
         </p>
-        <!-- <p>
-          <%= f.label :count1 %><br />
-          <%= f.text_field :count1 %>
-        </p>
-        <p>
-          <%= f.label :count2 %><br />
-          <%= f.text_field :count2 %>
-        </p> -->
         <p>
           <%= f.label :race_to %>:
           <%= f.text_field :race_to %>
@@ -32,7 +24,7 @@
     <td valign="top">
       <p>Current trends on Twitter:</p>
       <ul>
-        <% @trends.each do |trend| %>
+        <% TwitterTrends::current.each do |trend| %>
         <li>
           <%=h trend %>
         </li>
