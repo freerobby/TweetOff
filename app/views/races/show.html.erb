@@ -1,67 +1,56 @@
-<% if !@race.complete? %>
-  <h3>First to <%= @race.race_to %> wins.</h3>
-  <p>Race in progress. This page will refresh automatically!</p>
-<% else %>
-  <p><h1><em><%= @race.winning_term %></em> is the winner!</h1></p>
-<% end %>
+<div id="race_status">
+  <%= render :partial => "race_status" %>
+</div>
 
 <table width="100%">
   <tr>
     <td align="center" valign="middle" width="50%">
-      <h2><%= @race.term1 %> (<%= @race.count1 %> tweets)</h2>
+      <div id="query1_status">
+        <%= render :partial => "query_status", :locals => {:race => @race, :term =>1} %>
+      </div>
     </td>
     <td align="center" valign="middle" width="50%">
-      <h2><%= @race.term2 %> (<%= @race.count2 %> tweets)</h2>
+      <div id="query2_status">
+        <%= render :partial => "query_status", :locals => {:race => @race, :term =>2} %>
+      </div>
     </td>
   </tr>
   <tr>
     <td align="left" valign="top">
       <ol>
-      <% @race.twitter_tweets.all(:order => "twitter_id ASC").each do |t| %>
-        <% if t.term == 1 %>
-          <li><a href="http://twitter.com/<%= t.author %>" target="_blank"><b>@<%= t.author %></b></a>: <%= t.text %> [<a href="http://twitter.com/<%= t.author %>/status/<%= t.twitter_id %>" target="_blank">link</a>]<!-- (<%=h t.tweeted_at %>) --></li>
-        <% end %>
-      <% end %>
+        <div id="update_term1">
+        </div>
       </ol>
     </td>
     <td align="left" valign="top">
       <ol>
-      <% @race.twitter_tweets.all(:order => "twitter_id ASC").each do |t| %>
-        <% if t.term == 2 %>
-          <li><a href="http://twitter.com/<%= t.author %>" target="_blank"><b>@<%= t.author %></b></a>: <%= t.text %> [<a href="http://twitter.com/<%= t.author %>/status/<%= t.twitter_id %>" target="_blank">link</a>]<!-- (<%=h t.tweeted_at %>) --></li>
-        <% end %>
-      <% end %>
+        <div id="update_term2">
+        </div>
       </ol>
     </td>
   </tr>
 </table>
 
-<% if !@race.complete? %>
-  <script>
-  var limit="0:07"
+<!-- Load the existing tweets when the page loads. -->
+<script type="text/javascript">
+  <%= remote_function :url => {:action => "latest_tweets", :id => @race.id, :term => 1, :last_twitter_id => 0}, :update => "update_term1" %>
+  <%= remote_function :url => {:action => "latest_tweets", :id => @race.id, :term => 2, :last_twitter_id => 0}, :update => "update_term2" %>
+</script>
 
-  if (document.images){
-    var parselimit=limit.split(":")
-    parselimit=parselimit[0]*60+parselimit[1]*1
-  }
-  function beginrefresh() {
-    if (!document.images)
-      return
-    if (parselimit==1)
-      window.location.reload()
-    else{ 
-      parselimit-=1
-      curmin=Math.floor(parselimit/60)
-      cursec=parselimit%60
-      if (curmin!=0)
-        curtime=curmin+" minutes and "+cursec+" seconds left until page refresh!"
-      else
-        curtime=cursec+" seconds left until page refresh!"
-      window.status=curtime
-      setTimeout("beginrefresh()",1000)
-    }
-  }
+<!-- Grab latest tweets for term 1. -->
+<%= periodically_call_remote :url => {:action => "latest_tweets", :id => @race.id, :term => 1}, :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "update_term1", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id" %>
 
-  window.onload=beginrefresh
-  </script>
-<% end %>
+<!-- Grab latest tweets for term 2. -->
+<%= periodically_call_remote :url => {:action => "latest_tweets", :id => @race.id, :term => 2}, :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "update_term2", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id" %>
+
+<!-- Update the status of query 1 -->
+<%= periodically_call_remote :url => {:action => "update_query_status", :id => @race.id, :term => 1}, :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "query1_status", :condition => "race_finished == false" %>
+
+<!-- Update the status of query 2 -->
+<%= periodically_call_remote :url => {:action => "update_query_status", :id => @race.id, :term => 2}, :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "query2_status", :condition => "race_finished == false" %>
+
+<!-- Update the race status -->
+<%= periodically_call_remote :url => {:action => "update_race_status", :id => @race.id}, :frequency => (TWITTER_REFRESH_INTERVAL+1), :update => "race_status", :condition => "race_finished == false" %>
+
+<!-- Re-query from twitter. -->
+<%= periodically_call_remote :url => {:action => "refresh_status", :id => @race.id}, :frequency => "5", :condition => "race_finished == false" %>

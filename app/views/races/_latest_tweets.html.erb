@@ -1,0 +1,18 @@
+<%
+  last_twitter_id = 0 if last_twitter_id.nil?
+%>
+<% tweets.each do |t| %>
+  <li>
+    <a href="http://twitter.com/<%= t.author %>" target="_blank">
+      <b>
+        @<%= t.author %>
+      </b>
+    </a>:
+    <%= t.text %>
+    [<a href="http://twitter.com/<%= t.author %>/status/<%= t.twitter_id %>" target="_blank">link</a>]
+    <!-- (<%=h t.tweeted_at %>) -->
+  </li>
+<% end %>
+<script type="text/javascript">
+  last_twitter_id = <%= last_twitter_id %>;
+</script>

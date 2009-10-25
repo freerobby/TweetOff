@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091022201901) do
+ActiveRecord::Schema.define(:version => 20091025025310) do
 
   create_table "races", :force => true do |t|
     t.string   "term1"
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(:version => 20091022201901) do
     t.datetime "tweeted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "twitter_id2"
   end
 
 end

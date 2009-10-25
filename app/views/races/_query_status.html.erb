@@ -1,0 +1,7 @@
+<h2>
+  <% if term.to_i == 1 %>
+    <%= race.term1 %> (<%= race.count1 %> tweets)
+  <% elsif term.to_i == 2 %>
+    <%= race.term2 %> (<%= race.count2 %> tweets)
+  <% end %>
+</h2>

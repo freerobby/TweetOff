@@ -52,3 +52,5 @@ end
 
 BITLY_USER = "freerobby"
 BITLY_APIKEY = "R_99cd350dcf88511ebcbdd46a35cd5f0a"
+
+TWITTER_REFRESH_INTERVAL = 4.seconds

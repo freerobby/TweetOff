@@ -1,0 +1,15 @@
+<% if !@race.complete? %>
+  <h3>First to <%= @race.race_to %> wins.</h3>
+  <p>Race in progress. This page will refresh automatically!</p>
+<% else %>
+  <p><h1><em><%= @race.winning_term %></em> is the winner!</h1></p>
+<% end %>
+<script type="text/javascript">
+  //<![CDATA[
+  <% if @race.complete? %>
+    race_finished = true;
+  <% else %>
+    race_finished = false;
+  <% end %>
+  //]]>
+</script>

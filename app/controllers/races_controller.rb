@@ -23,6 +23,36 @@ class RacesController < ApplicationController
       format.xml  { render :xml => @race }
     end
   end
+  def latest_tweets
+    @race = Race.find(params[:id])
+    last_tweet = @race.twitter_tweets.descend_by_twitter_id.first
+    last_twitter_id = 0
+    last_twitter_id = last_tweet.twitter_id if !last_tweet.nil?
+    render :partial => "latest_tweets", :locals => {:last_twitter_id => last_twitter_id, :tweets => @race.twitter_tweets.term_equals(params[:term]).twitter_id_greater_than(params[:last_twitter_id].to_i).ascend_by_twitter_id}
+  end
+  def refresh_status
+    @race = Race.find(params[:id])
+    @race.go!
+    render :text => "Success!"
+  end
+  
+  def update_query_status
+    if request.xhr?
+      @race = Race.find(params[:id])
+      render :partial => "query_status", :locals => {:race => @race, :term => params[:term]}
+    else
+      redirect_to '/'
+    end
+  end
+  
+  def update_race_status
+    if request.xhr?
+      @race = Race.find(params[:id])
+      render :partial => "race_status"
+    else
+      redirect_to '/'
+    end
+  end
 
   # GET /races/new
   # GET /races/new.xml

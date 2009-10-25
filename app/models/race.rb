@@ -20,7 +20,7 @@ class Race < ActiveRecord::Base
   named_scope :complete, :conditions => {:complete? => true}
   
   def go!
-    update_status if count1 < self.race_to && count2 < self.race_to && (Time.now > (self.updated_at + 5.seconds))
+    update_status if count1 < self.race_to && count2 < self.race_to && (Time.now > (self.updated_at + TWITTER_REFRESH_INTERVAL))
   end
   
   def winner
@@ -173,13 +173,13 @@ class Race < ActiveRecord::Base
       # Store the tweets
       newTweets1.each do |t|
         # This if should not be necessary, but it is. Figure out why.
-        if self.twitter_tweets.find_by_term_and_twitter_id(1, t.id.to_s).nil?
+        if self.twitter_tweets.find_by_term_and_twitter_id(1, t.id).nil?
           self.twitter_tweets.build(:text => t.text, :twitter_id => t.id, :author => t.from_user, :term => 1, :tweeted_at => t.created_at)
         end
       end
       newTweets2.each do |t|
         # This if should not be necessary, but it is. Figure out why.
-        if self.twitter_tweets.find_by_term_and_twitter_id(2, t.id.to_s).nil?
+        if self.twitter_tweets.find_by_term_and_twitter_id(2, t.id).nil?
           self.twitter_tweets.build(:text => t.text, :twitter_id => t.id, :author => t.from_user, :term => 2, :tweeted_at => t.created_at)
         end
       end
