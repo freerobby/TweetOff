@@ -25,7 +25,7 @@ class RacesController < ApplicationController
     last_tweet = @race.twitter_tweets.descend_by_twitter_id.first
     last_twitter_id = 0
     last_twitter_id = last_tweet.twitter_id if !last_tweet.nil?
-    render :partial => "latest_tweets", :locals => {:last_twitter_id => last_twitter_id, :tweets => @race.twitter_tweets.term_equals(params[:term]).twitter_id_greater_than(params[:last_twitter_id].to_i).ascend_by_twitter_id}
+    render :partial => "latest_tweets", :locals => {:last_twitter_id => last_twitter_id, :tweets => TwitterTweet.race_id_equals(@race.id).term_equals(params[:term]).twitter_id_greater_than(params[:last_twitter_id].to_i).ascend_by_twitter_id}
   end
   def refresh_status
     @race = Race.find(params[:id])

@@ -24,6 +24,7 @@ describe RacesController do
 
   describe "GET new" do
     it "assigns a new race as @race" do
+      FakeWeb.register_uri(:get, "http://search.twitter.com/trends/current.json", :body => FakeTrendsJSON) # Don't make call for Twitter trends
       Race.stub!(:new).and_return(mock_race)
       get :new
       assigns[:race].should equal(mock_race)

@@ -13,25 +13,28 @@
       <li><a href="http://twitter.com/itsatweetoff" target="_blank">Follow us on Twitter!</a></li>
       <li><a href="<%= new_race_path %>">New TweetOff!</a></li>
       <li><a href="<%= races_path %>">All TweetOffs!</a></li>
-      <!-- <li><a href="http://freerobby.com">Author</a></li> -->
-      <!-- <li><a href="#">Locations</a></li>
-      <li><a href="#">Contact</a></li> -->
     </ul>
 		<div id="text">
   	  <p style="color: green"><%= flash[:notice] %></p>
       <%= yield %>
 		</div>
 		<div id="green_bubble">
-      <!-- <p>
-        Built by <a href="http://freerobby.com">Robby Grossman.</a> an employee of <a href="http://oneforty.com">oneforty</a>
-      </p> -->
+      <p>
+        <!-- <a href="http://twitter.com/itsatweetoff">Follow us on Twitter -->
+        <a href="http://oneforty.com/item/tweetoff" target="_blank">Review us on oneforty</a>
+      </a>
 		</div>
 	</div>
 	<div id="footer">
 		<div class="wrap">
 			<div id="bubble">
-			  <p>Built by <a href="http://freerobby.com">Robby Grossman.</a></p>
-			  <p>Copyright &copy; 2009.</p>
+			  <p>
+			    Built by <a href="http://freerobby.com" target="_blank">Robby Grossman</a>
+			    <br />
+			    <a href="http://twitter.com/freerobby" target="_blank">@freerobby</a>
+			    <br />
+			    &copy; 2009
+			  </p>
 			</div>
 			<div id="copyright">
 				<p>Site design based on <a title="Free CSS Templates" href="http://www.solucija.com/">Happy Template</a><br />under a <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Licence</a></p>

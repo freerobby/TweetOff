@@ -16,68 +16,56 @@ class Race < ActiveRecord::Base
   
   named_scope :complete, :conditions => {:complete? => true}
   
-  def go!
-    update_status if count1 < self.race_to && count2 < self.race_to && (Time.now > (self.updated_at + TWITTER_REFRESH_INTERVAL))
+  def began_at
+    self.created_at
   end
   
-  def winner
-    if count1 > count2
-      1
-    elsif count2 > count1
-      2
-    else
-      0
-    end
-  end
-  def loser
-    if winner == 0
-      0
-    elsif winner == 1
-      2
-    else
-      1
-    end
-  end
-  def winning_term
-    if winner == 1
-      self.term1
-    elsif winner == 2
-      self.term2
-    else
-      "Nobody"
-    end
-  end
-  
-  def count1
-    self.twitter_tweets.find_all_by_term(1).size
-  end
-  def count2
-    self.twitter_tweets.find_all_by_term(2).size
-  end
-    
   def complete?
     count1 >= self.race_to || count2 >= self.race_to
   end
   
-  def began_at
-    self.created_at
+  def link_to_show
+    @bitly = ::Bitly.new(BITLY_USER, BITLY_APIKEY)
+    @bitly.shorten(APP_BASE + "/races/" + self.id.to_s).short_url
   end
+  
+  def loser
+    return 0 if winner == 0
+    return 1 if winner == 2
+    2 # if winner == 1
+  end
+  
+  def winner
+    return 0 if count1 == count2
+    return 1 if count1 > count2
+    2 # if count2 > count1
+  end
+  
+  def winning_term
+    return "Nobody" if winner == 0
+    return self.term1 if winner == 1
+    self.term2 # if winner == 2
+  end
+  
+  def count1
+    self.twitter_tweets.term_equals(1).size
+  end
+  
+  def count2
+    self.twitter_tweets.term_equals(2).size
+  end
+  
   def ended_at
     ts = self.twitter_tweets.all(:order => "tweeted_at DESC", :limit => 1).first
-    if ts.nil?
-      self.updated_at
-    else
-      ts.tweeted_at
-    end
+    ts.nil? ? self.updated_at : ts.tweeted_at
   end
   
   def duration
     ended_at - began_at
   end
   
-  def link_to_show
-    @bitly = ::Bitly.new(BITLY_USER, BITLY_APIKEY)
-    @bitly.shorten(APP_BASE + "/races/" + self.id.to_s).short_url
+  def go!
+    update_status if !(complete?) && (Time.now > (self.updated_at + TWITTER_REFRESH_INTERVAL))
   end
   
   private
@@ -92,8 +80,7 @@ class Race < ActiveRecord::Base
   end
   
   def post_to_twitter
-    httpauth = Twitter::HTTPAuth.new(TWITTER_EMAIL, TWITTER_PASSWORD)
-    client = Twitter::Base.new(httpauth)
+    client = get_twitter_client
     client.update(generate_twitter_status)
   end
   
@@ -144,56 +131,65 @@ class Race < ActiveRecord::Base
     end
   end
   
-  def initialize_last_tweets
+  def get_last_tweet1
+    client = get_twitter_client
+    last_tweets = Twitter::Search.new(self.term1).per_page(1).fetch().results
+    (last_tweets.size > 0) ? last_tweets.first.id : 0
+  end
+  
+  def get_last_tweet2
+    client = get_twitter_client
+    last_tweets = Twitter::Search.new(self.term2).per_page(1).fetch().results
+    (last_tweets.size > 0) ? last_tweets.first.id : 0
+  end
+  
+  def get_twitter_client
     httpauth = Twitter::HTTPAuth.new(TWITTER_EMAIL, TWITTER_PASSWORD)
-    client = Twitter::Base.new(httpauth)
-    term1_tweets = Twitter::Search.new(self.term1).per_page(1).fetch().results
-    term2_tweets = Twitter::Search.new(self.term2).per_page(1).fetch().results
-    if term1_tweets.size > 0
-      self.last_tweet1 = term1_tweets.first.id.to_s
-    else
-      self.last_tweet1 = 0
-    end
-    if term2_tweets.size > 0
-      self.last_tweet2 = term2_tweets.first.id.to_s
-    else
-      self.last_tweet2 = 0
-    end
+    Twitter::Base.new(httpauth)
+  end
+  
+  def initialize_last_tweets
+    self.last_tweet1 = get_last_tweet1
+    self.last_tweet2 = get_last_tweet2
     self.save!
   end
-  # ToDo: Only update if it's been at least delay seconds.
+  
+  def term1_timeline
+    begin
+      client = get_twitter_client
+      max_results = self.race_to - count1
+      Twitter::Search.new(self.term1).since(self.last_tweet1).per_page(max_results).page(1).fetch().results
+    rescue Twitter::TwitterError => e
+      nil
+    end
+  end
+  def term2_timeline
+    begin
+      client = get_twitter_client
+      max_results = self.race_to - count2
+      Twitter::Search.new(self.term2).since(self.last_tweet2).per_page(max_results).page(1).fetch().results
+    rescue Twitter::TwitterError => e
+      nil
+    end
+  end
+  
   def update_status
     begin
-      puts "Updating Status..."
-      httpauth = Twitter::HTTPAuth.new(TWITTER_EMAIL, TWITTER_PASSWORD)
-      client = Twitter::Base.new(httpauth)
-      max_results1 = self.race_to - count1
-      max_results2 = self.race_to - count2
-      puts "Max Results 1: " + max_results1.to_s
-      puts "Max Results 2: " + max_results2.to_s
-    
-      # Store the tweets\
-      puts "Term 1: " + self.term1
-      puts "Last Tweet 1: " + self.last_tweet1.to_s
-      search1 = Twitter::Search.new(self.term1).since(self.last_tweet1).per_page(max_results1).page(1).fetch().results
+      search1 = term1_timeline
       if !search1.nil?
         search1.each do |t|
-          puts "  Result: " + t.inspect
           self.twitter_tweets.build(:text => t.text, :twitter_id => t.id, :author => t.from_user, :term => 1, :tweeted_at => t.created_at)
         end
       end
-      puts "Term 2: " + self.term2
-      puts "Last Tweet 2: " + self.last_tweet2.to_s
-      search2 = Twitter::Search.new(self.term2).since(self.last_tweet2).per_page(max_results2).page(1).fetch().results
+      search2 = term2_timeline
       if !search2.nil?
         search2.each do |t|
-          puts "  Result: " + t.inspect
           self.twitter_tweets.build(:text => t.text, :twitter_id => t.id, :author => t.from_user, :term => 2, :tweeted_at => t.created_at)
         end
       end
       self.save!
-      lta1 = self.twitter_tweets.term_equals(1).descend_by_twitter_id.first
-      lta2 = self.twitter_tweets.term_equals(2).descend_by_twitter_id.first
+      lta1 = TwitterTweet.race_id_equals(self.id).term_equals(1).descend_by_twitter_id.first
+      lta2 = TwitterTweet.race_id_equals(self.id).term_equals(2).descend_by_twitter_id.first
       self.last_tweet1 = lta1.twitter_id if !lta1.nil?
       self.last_tweet2 = lta2.twitter_id if !lta2.nil?
       self.save!

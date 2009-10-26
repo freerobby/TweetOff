@@ -12,6 +12,8 @@ describe "/races/new.html.erb" do
       :last_tweet1 => 0,
       :last_tweet2 => 0
     )
+    
+    FakeWeb.register_uri(:get, "http://search.twitter.com/trends/current.json", :body => FakeTrendsJSON) # Don't make call for Twitter trends
   end
 
   it "renders new race form with term1, term2 and race_to" do

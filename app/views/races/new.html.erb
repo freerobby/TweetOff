@@ -1,9 +1,13 @@
 <table align="center">
   <tr>
-    <td valign="top">
+    <td valign="top" width="50%">
+      <p>
+        <em>
+          Note: to compare mentions of two twitter users, please enter their Twitter handles, prefixed with the &quot;@&quot; symbol.
+        </em>
+      </p>
       <% form_for(@race) do |f| %>
         <%= f.error_messages %>
-
         <p>
           <%= f.label "Query 1" %>: 
           <%= f.text_field :term1 %>
@@ -21,7 +25,7 @@
         </p>
       <% end %>
     </td>
-    <td valign="top">
+    <td valign="top" width="50%">
       <p>Current trends on Twitter:</p>
       <ul>
         <% TwitterTrends::current.each do |trend| %>
