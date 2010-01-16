@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe RaceUpdater do
-  before :all do
+  before do
     # Create empty races when using factories (no search results)
     Race.any_instance.stubs(:get_last_tweet1).returns(0)
     Race.any_instance.stubs(:get_last_tweet2).returns(0)

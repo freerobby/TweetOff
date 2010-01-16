@@ -7,6 +7,7 @@ require 'spec/rails'
 
 require 'fakeweb'
 require 'json'
+require 'will_paginate'
 
 FakeWeb.allow_net_connect = false
 
@@ -23,39 +24,15 @@ Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
-
-  # == Fixtures
-  #
-  # You can declare fixtures for each example_group like this:
-  #   describe "...." do
-  #     fixtures :table_a, :table_b
-  #
-  # Alternatively, if you prefer to declare them only once, you can
-  # do so right here. Just uncomment the next line and replace the fixture
-  # names with your fixtures.
-  #
-  # config.global_fixtures = :table_a, :table_b
-  #
-  # If you declare global fixtures, be aware that they will be declared
-  # for all of your examples, even those that don't use them.
-  #
-  # You can also declare which fixtures to use (for example fixtures for test/fixtures):
-  #
-  # config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
-  #
-  # == Mock Framework
-  #
-  # RSpec uses it's own mocking framework by default. If you prefer to
-  # use mocha, flexmock or RR, uncomment the appropriate line:
-  #
-  # config.mock_with :mocha
-  # config.mock_with :flexmock
-  # config.mock_with :rr
-  #
-  # == Notes
-  #
-  # For more information take a look at Spec::Runner::Configuration and Spec::Runner
+  
+  config.after :each do
+    mocha_teardown
+  end
 end
+
+# Spec::Runner.configuration.before(:all, :behaviour_type => :controller) do
+#   @integrate_views = true
+# end
 
 FakeTrendsJSON = '{"trends":{"2009-12-30 03:00:38":[{"name":"#nowplaying","query":"#nowplaying"},{"name":"#iloveitwhen","query":"#iloveitwhen"},{"name":"#jonasmemories","query":"#jonasmemories"},{"name":"Stop Misspelling","query":"\"Stop Misspelling\""},{"name":"NYE","query":"NYE"},{"name":"Words You Need","query":"\"Words You Need\""},{"name":"Avatar","query":"Avatar"},{"name":"Pro Bowl","query":"\"Pro Bowl\""},{"name":"#RIPTheRev","query":"#RIPTheRev"},{"name":"Kennedy Center","query":"\"Kennedy Center\""}]},"as_of":1262142038}'
 

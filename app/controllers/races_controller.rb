@@ -2,7 +2,8 @@ class RacesController < ApplicationController
   # GET /races
   # GET /races.xml
   def index
-    @races = Race.all.paginate(:page => params[:page], :per_page => 25)
+    @search = Race.search(params[:search])
+    @races = @search.all.paginate(:page => params[:page], :per_page => 25)
 
     respond_to do |format|
       format.html # index.html.erb
