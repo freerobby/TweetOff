@@ -18,7 +18,7 @@ class Race < ActiveRecord::Base
     self.created_at
   end
   
-  def complete?
+  def is_complete?
     count1 >= self.race_to || count2 >= self.race_to
   end
   
@@ -67,7 +67,7 @@ class Race < ActiveRecord::Base
   end
   
   def go!
-    update_status if !(complete?) && twitter_timeout_passed?
+    update_status if !(complete?) && !(is_complete?) && twitter_timeout_passed?
   end
   
   private
@@ -198,7 +198,11 @@ class Race < ActiveRecord::Base
     rescue Twitter::TwitterError => e
       self.save!
     end
-    cleanup if complete?
-    post_to_twitter if complete?
+    
+    if is_complete?
+      self.update_attribute(:complete, true)
+      cleanup
+      post_to_twitter
+    end
   end
 end

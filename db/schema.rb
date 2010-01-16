@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091025041302) do
+ActiveRecord::Schema.define(:version => 20100116063038) do
 
   create_table "races", :force => true do |t|
     t.string   "term1"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(:version => 20091025041302) do
     t.datetime "updated_at"
     t.integer  "last_tweet1", :default => 0
     t.integer  "last_tweet2", :default => 0
+    t.boolean  "complete",    :default => false
   end
 
   create_table "twitter_tweets", :force => true do |t|

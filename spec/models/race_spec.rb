@@ -138,22 +138,22 @@ describe Race do
       end
     end
   
-    describe "complete?()" do
+    describe "is_complete?()" do
       it "should be true if count1 >= race_to" do
         @twitter_vs_facebook.stub!(:count1).and_return(8)
         @twitter_vs_facebook.stub!(:race_to).and_return(5)
-        @twitter_vs_facebook.complete?.should == true
+        @twitter_vs_facebook.is_complete?.should == true
       end
       it "should be true if count2 >= race_to" do
         @twitter_vs_facebook.stub!(:count2).and_return(8)
         @twitter_vs_facebook.stub!(:race_to).and_return(5)
-        @twitter_vs_facebook.complete?.should == true
+        @twitter_vs_facebook.is_complete?.should == true
       end
       it "should be false if count1 < race_to and count2 < race_to" do
         @twitter_vs_facebook.stub!(:count1).and_return(8)
         @twitter_vs_facebook.stub!(:count2).and_return(6)
         @twitter_vs_facebook.stub!(:race_to).and_return(10)
-        @twitter_vs_facebook.complete?.should == false
+        @twitter_vs_facebook.is_complete?.should == false
       end
     end
   
@@ -251,7 +251,7 @@ describe Race do
       end
       
       it "should not call update_status if we're within the twitter refresh interval" do
-        @twitter_vs_facebook.stub!(:udpated_at).and_return(Time.now - 1.day)
+        @twitter_vs_facebook.stub!(:twitter_timeout_passed?).and_return(false)
         @twitter_vs_facebook.should_not_receive(:update_status)
         @twitter_vs_facebook.go!
       end
