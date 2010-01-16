@@ -32,10 +32,8 @@ describe RacesController do
   end
 
   describe "GET edit" do
-    it "assigns the requested race as @race" do
-      Race.stub!(:find).with("37").and_return(mock_race)
-      get :edit, :id => "37"
-      assigns[:race].should equal(mock_race)
+    it "should throw routing error" do
+      lambda {get :edit, :id => "37"}.should raise_error(ActionController::RoutingError)
     end
   end
 
@@ -72,14 +70,14 @@ describe RacesController do
   end
 
   describe "PUT update" do
-    it "does not find the update action" do
-      lambda {put :update, :id => "37", :race => {:these => 'params'}}.should raise_error(ActionController::UnknownAction)
+    it "should throw routing error" do
+      lambda {put :update, :id => "37", :race => {:these => 'params'}}.should raise_error(ActionController::RoutingError)
     end
   end
 
   describe "DELETE destroy" do
-    it "does not find the destroy action" do
-      lambda {delete :destroy, :id => "37"}.should raise_error(ActionController::UnknownAction)
+    it "should throw routing error" do
+      lambda {delete :destroy, :id => "37"}.should raise_error(ActionController::RoutingError)
     end
   end
 

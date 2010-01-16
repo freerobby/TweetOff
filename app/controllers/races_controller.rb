@@ -65,11 +65,6 @@ class RacesController < ApplicationController
     end
   end
 
-  # GET /races/1/edit
-  def edit
-    @race = Race.find(params[:id])
-  end
-
   # POST /races
   # POST /races.xml
   def create

@@ -33,24 +33,24 @@
 
 <!-- Load the existing tweets when the page loads. -->
 <script type="text/javascript">
-  <%= remote_function :url => {:action => "latest_tweets", :id => @race.id, :term => 1, :last_twitter_id => 0}, :update => "update_term1" %>
-  <%= remote_function :url => {:action => "latest_tweets", :id => @race.id, :term => 2, :last_twitter_id => 0}, :update => "update_term2" %>
+  <%= remote_function :url => latest_tweets_races_url(:id => @race.id, :term => 1, :last_twitter_id => 0), :update => "update_term1", :method => :get %>
+  <%= remote_function :url => latest_tweets_races_url(:id => @race.id, :term => 2, :last_twitter_id => 0), :update => "update_term2", :method => :get %>
 </script>
 
 <!-- Grab latest tweets for term 1. -->
-<%= periodically_call_remote :url => {:action => "latest_tweets", :id => @race.id, :term => 1}, :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "update_term1", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id" %>
+<%= periodically_call_remote :url => latest_tweets_races_url(:id => @race.id, :term => 1), :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "update_term1", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id", :method => :get %>
 
 <!-- Grab latest tweets for term 2. -->
-<%= periodically_call_remote :url => {:action => "latest_tweets", :id => @race.id, :term => 2}, :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "update_term2", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id" %>
+<%= periodically_call_remote :url => latest_tweets_races_url(:id => @race.id, :term => 2), :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "update_term2", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id", :method => :get %>
 
 <!-- Update the status of query 1 -->
-<%= periodically_call_remote :url => {:action => "update_query_status", :id => @race.id, :term => 1}, :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "query1_status", :condition => "race_finished == false" %>
+<%= periodically_call_remote :url => update_query_status_races_url(:id => @race.id, :term => 1), :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "query1_status", :condition => "race_finished == false", :method => :get %>
 
 <!-- Update the status of query 2 -->
-<%= periodically_call_remote :url => {:action => "update_query_status", :id => @race.id, :term => 2}, :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "query2_status", :condition => "race_finished == false" %>
+<%= periodically_call_remote :url => update_query_status_races_url(:id => @race.id, :term => 2), :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "query2_status", :condition => "race_finished == false", :method => :get %>
 
 <!-- Update the race status -->
-<%= periodically_call_remote :url => {:action => "update_race_status", :id => @race.id}, :frequency => (TWITTER_REFRESH_INTERVAL+1), :update => "race_status", :condition => "race_finished == false" %>
+<%= periodically_call_remote :url => update_race_status_races_url(:id => @race.id), :frequency => (TWITTER_REFRESH_INTERVAL+1), :update => "race_status", :condition => "race_finished == false", :method => :get %>
 
 <!-- Re-query from twitter. -->
-<%= periodically_call_remote :url => {:action => "refresh_status", :id => @race.id}, :frequency => "5", :condition => "race_finished == false" %>
+<%= periodically_call_remote :url => refresh_status_races_url(:id => @race.id), :frequency => "5", :condition => "race_finished == false", :method => :post %>
