@@ -14,8 +14,6 @@ class Race < ActiveRecord::Base
   
   after_create :initialize_last_tweets
   
-  named_scope :complete, :conditions => {:complete? => true}
-  
   def began_at
     self.created_at
   end
@@ -64,8 +62,12 @@ class Race < ActiveRecord::Base
     ended_at - began_at
   end
   
+  def twitter_timeout_passed?
+    (Time.now > (self.updated_at + TWITTER_REFRESH_INTERVAL))
+  end
+  
   def go!
-    update_status if !(complete?) && (Time.now > (self.updated_at + TWITTER_REFRESH_INTERVAL))
+    update_status if !(complete?) && twitter_timeout_passed?
   end
   
   private

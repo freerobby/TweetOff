@@ -1,3 +1,6 @@
+Factory.define :race do |r|
+end
+
 Factory.define :twitter_vs_facebook, :class => :race do |r|
   r.add_attribute :term1, "Twitter"
   r.add_attribute :term2, "Facebook"
