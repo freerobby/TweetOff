@@ -5,7 +5,8 @@ ActionController::Routing::Routes.draw do |map|
     :update_race_status => :get,
     :refresh_status => :post
   }
-  map.resources :pages, :controller => "pages", :only => [:show]
+  map.resources :pages, :controller => :pages, :only => [:show]
   
   map.root :controller => :pages, :id => :about, :action => :show
+  map.explain '/explain', :controller => :pages, :action => :show, :id => :explain_signin
 end

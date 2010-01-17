@@ -3,6 +3,7 @@ include ActionView::Helpers::DateHelper
 
 class Race < ActiveRecord::Base
   
+  belongs_to :user
   has_many :twitter_tweets
   default_scope :order => "created_at DESC"
   
@@ -23,8 +24,8 @@ class Race < ActiveRecord::Base
   end
   
   def link_to_show
-    @bitly = ::Bitly.new(BITLY_USER, BITLY_APIKEY)
-    @bitly.shorten(APP_BASE + "/races/" + self.id.to_s).short_url
+    bitly = ::Bitly.new(BITLY_USER, BITLY_APIKEY)
+    bitly.shorten(APP_BASE + "/races/" + self.id.to_s).short_url
   end
   
   def loser
@@ -72,17 +73,29 @@ class Race < ActiveRecord::Base
   
   private
   def generate_twitter_status
+    at_reply = self.user.nil? ? "" : " @" + self.user.login
     if winner == 0
-      "It's a draw! \"" + self.term1 + "\" and \"" + self.term2 + "\" both got " + count1.to_s + " mentions in " + (distance_of_time_in_words duration) + ". " + link_to_show
+      "It's a draw! \"" + self.term1 + "\" and \"" + self.term2 + "\" both got " + count1.to_s + " mentions in " + (distance_of_time_in_words duration) + ". " + link_to_show + at_reply
     elsif winner == 1
-      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions and bested " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". " + link_to_show
+      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions and bested " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". " + link_to_show + at_reply
     else # winner == 2
-      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions and bested " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". " + link_to_show
+      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions and bested " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". " + link_to_show + at_reply
+    end
+  end
+  
+  def get_twitter_client(tweetoff_account = false)
+    if self.user.nil? || tweetoff_account
+      httpauth = Twitter::HTTPAuth.new(TWITTER_EMAIL, TWITTER_PASSWORD)
+      return Twitter::Base.new(httpauth)
+    else
+      oauth = Twitter::OAuth.new(TwitterAuth.config['oauth_consumer_key'], TwitterAuth.config['oauth_consumer_secret'])
+      oauth.authorize_from_access(self.user.access_token, self.user.access_secret)
+      return Twitter::Base.new(oauth)
     end
   end
   
   def post_to_twitter
-    client = get_twitter_client
+    client = get_twitter_client(true)
     client.update(generate_twitter_status)
   end
   
@@ -143,11 +156,6 @@ class Race < ActiveRecord::Base
     client = get_twitter_client
     last_tweets = Twitter::Search.new(self.term2).per_page(1).fetch().results
     (last_tweets.size > 0) ? last_tweets.first.id : 0
-  end
-  
-  def get_twitter_client
-    httpauth = Twitter::HTTPAuth.new(TWITTER_EMAIL, TWITTER_PASSWORD)
-    Twitter::Base.new(httpauth)
   end
   
   def initialize_last_tweets

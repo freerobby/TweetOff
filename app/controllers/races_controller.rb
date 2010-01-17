@@ -70,7 +70,7 @@ class RacesController < ApplicationController
   # POST /races.xml
   def create
     @race = Race.new(params[:race])
-
+    @race.user = current_user if logged_in?
     respond_to do |format|
       if @race.save
         #flash[:notice] = 'Race was successfully created.'

@@ -19,6 +19,7 @@ Rails::Initializer.run do |config|
   config.gem "searchlogic", :version => '2.3.5', :source => "http://gemcutter.org"
   config.gem "twitter", :version => '0.6.15', :source => "http://gemcutter.org"
   config.gem "bitly", :version => '0.3.1', :source => "http://gemcutter.org"
+  config.gem "twitter-auth", :lib => "twitter_auth", :version => '0.1.22', :source => "http://gemcutter.org"
   
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named

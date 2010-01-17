@@ -235,6 +235,17 @@ describe Race do
       end
     end
     
+    describe "twitter_timeout_passed?()" do
+      it "should return false when within interval" do
+        @twitter_vs_facebook.stub!(:updated_at).and_return(Time.now - TWITTER_REFRESH_INTERVAL + 1.minute)
+        @twitter_vs_facebook.twitter_timeout_passed?.should == false
+      end
+      it "should return true when beyond interval" do
+        @twitter_vs_facebook.stub!(:updated_at).and_return(Time.now - TWITTER_REFRESH_INTERVAL - 1.minute)
+        @twitter_vs_facebook.twitter_timeout_passed?.should == true
+      end
+    end
+    
     describe "go!()" do
       it "should call update status if the race is not over and we've passed the twitter refresh interval" do
         @twitter_vs_facebook.stub!(:update_status)
@@ -270,6 +281,114 @@ describe Race do
     @empty_tweets = Race.create(:term1 => "Fox", :term2 => "CNN", :race_to => 10)
     @empty_tweets.last_tweet1.should == 0
     @empty_tweets.last_tweet2.should == 0
+  end
+  
+  describe "private methods" do
+    describe "generate_twitter_status()" do
+      before do
+        # Create empty races when using factories (no search results)
+        Race.any_instance.stubs(:get_last_tweet1).returns(0)
+        Race.any_instance.stubs(:get_last_tweet2).returns(0)
+        # No need to really go through the motions.
+        Race.any_instance.stubs(:update_status)
+        # Assume we are not bailing due to hammering Twitter too much.
+        Race.any_instance.stubs(:twitter_timeout_passed?).returns(true)
+      end
+      describe "user-owned" do
+        before do
+          user = Factory.create :user, :login => "user", :twitter_id => "237237283"
+          
+          @race = Factory.create :race, :term1 => "ipod", :term2 => "iphone", :race_to => 10, :user => user
+          @race.stub!(:duration).and_return(1.hour)
+          @race.stub!(:link_to_show).and_return("http://link.to/return")
+        end
+        it "should generate properly on draw" do
+          @race.stub!(:count1).and_return(10)
+          @race.stub!(:count2).and_return(10)
+          generated_status = @race.send(:generate_twitter_status)
+          generated_status.should include_text "It's a draw!"
+          generated_status.should include_text "@user"
+        end
+        it "should generate properly on term1 winner" do
+          @race.stub!(:count1).and_return(10)
+          @race.stub!(:count2).and_return(5)
+          generated_status = @race.send(:generate_twitter_status)
+          generated_status.should include_text '"ipod" got 10 mentions and bested "iphone", which got 5'
+          generated_status.should include_text "@user"
+        end
+        it "should generate proplery on term2 winner" do
+          @race.stub!(:count1).and_return(5)
+          @race.stub!(:count2).and_return(10)
+          generated_status = @race.send(:generate_twitter_status)
+          generated_status.should include_text '"iphone" got 10 mentions and bested "ipod", which got 5'
+          generated_status.should include_text "@user"
+        end
+      end
+      describe "anonymous" do
+        before do
+          @race = Factory.create :race, :term1 => "ipod", :term2 => "iphone", :race_to => 10
+          @race.stub!(:duration).and_return(1.hour)
+          @race.stub!(:link_to_show).and_return("http://link.to/return")
+        end
+        it "should generate properly on draw" do
+          @race.stub!(:count1).and_return(10)
+          @race.stub!(:count2).and_return(10)
+          generated_status = @race.send(:generate_twitter_status)
+          generated_status.should include_text "It's a draw!"
+          generated_status.should_not include_text "@"
+        end
+        it "should generate properly on term1 winner" do
+          @race.stub!(:count1).and_return(10)
+          @race.stub!(:count2).and_return(5)
+          generated_status = @race.send(:generate_twitter_status)
+          generated_status.should include_text '"ipod" got 10 mentions and bested "iphone", which got 5'
+          generated_status.should_not include_text "@"
+        end
+        it "should generate proplery on term2 winner" do
+          @race.stub!(:count1).and_return(5)
+          @race.stub!(:count2).and_return(10)
+          generated_status = @race.send(:generate_twitter_status)
+          generated_status.should include_text '"iphone" got 10 mentions and bested "ipod", which got 5'
+          generated_status.should_not include_text "@"
+        end
+      end
+    end
+    describe "get_twitter_client()" do
+      before do
+        # Create empty races when using factories (no search results)
+        Race.any_instance.stubs(:get_last_tweet1).returns(0)
+        Race.any_instance.stubs(:get_last_tweet2).returns(0)
+        # No need to really go through the motions.
+        Race.any_instance.stubs(:update_status)
+      end
+      describe "signed in via oauth" do
+        before do
+          user = Factory.create :user, :login => "user", :twitter_id => "237237283"
+          @race = Factory.create :race, :term1 => "ipod", :term2 => "iphone", :race_to => 10, :user => user
+        end
+        it "should return oauth client by default" do
+          @mock_oauth = mock_model(Twitter::OAuth)
+          Twitter::OAuth.stub(:new).once.and_return(@mock_oauth)
+          @mock_oauth.stub!(:authorize_from_access)
+          @race.send(:get_twitter_client)
+        end
+        it "should return http client with tweetoff_account override" do
+          @mock_httpauth = mock_model(Twitter::HTTPAuth)
+          Twitter::HTTPAuth.stub(:new).once.and_return(@mock_httpauth)
+          @race.send(:get_twitter_client, true)
+        end
+      end
+      describe "not signed in via oauth" do
+        before do
+          @race = Factory.create :race, :term1 => "ipod", :term2 => "iphone", :race_to => 10
+        end
+        it "should return httpauth client" do
+          @mock_httpauth = mock_model(Twitter::HTTPAuth)
+          Twitter::HTTPAuth.stub(:new).once.and_return(@mock_httpauth)
+          @race.send(:get_twitter_client)
+        end
+      end
+    end
   end
   
 end

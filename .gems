@@ -3,3 +3,4 @@ will_paginate                                         --version 2.3.11      --so
 searchlogic                                           --version 2.3.5       --source gemcutter.org
 twitter                                               --version 0.6.15      --source gemcutter.org
 bitly                                                 --version 0.3.1       --source gemcutter.org
+twitter-auth                                          --version 0.1.22      --source gemcutter.org
