@@ -94,6 +94,44 @@ class Race < ActiveRecord::Base
     end
   end
   
+  def get_last_tweet1
+    client = get_twitter_client
+    last_tweets = Twitter::Search.new(self.term1).per_page(1).fetch().results
+    (last_tweets.size > 0) ? last_tweets.first.id : 0
+  end
+  
+  def get_last_tweet2
+    client = get_twitter_client
+    last_tweets = Twitter::Search.new(self.term2).per_page(1).fetch().results
+    (last_tweets.size > 0) ? last_tweets.first.id : 0
+  end
+  
+  def term1_timeline
+    begin
+      client = get_twitter_client
+      max_results = self.race_to - count1
+      Twitter::Search.new(self.term1).since(self.last_tweet1).per_page(max_results).page(1).fetch().results
+    rescue Twitter::TwitterError => e
+      nil
+    end
+  end
+  
+  def term2_timeline
+    begin
+      client = get_twitter_client
+      max_results = self.race_to - count2
+      Twitter::Search.new(self.term2).since(self.last_tweet2).per_page(max_results).page(1).fetch().results
+    rescue Twitter::TwitterError => e
+      nil
+    end
+  end
+  
+  def initialize_last_tweets
+    self.last_tweet1 = get_last_tweet1
+    self.last_tweet2 = get_last_tweet2
+    self.save!
+  end
+  
   def post_to_twitter
     client = get_twitter_client(true)
     client.update(generate_twitter_status)
@@ -143,43 +181,6 @@ class Race < ActiveRecord::Base
         t.destroy
       end
       self.save!
-    end
-  end
-  
-  def get_last_tweet1
-    client = get_twitter_client
-    last_tweets = Twitter::Search.new(self.term1).per_page(1).fetch().results
-    (last_tweets.size > 0) ? last_tweets.first.id : 0
-  end
-  
-  def get_last_tweet2
-    client = get_twitter_client
-    last_tweets = Twitter::Search.new(self.term2).per_page(1).fetch().results
-    (last_tweets.size > 0) ? last_tweets.first.id : 0
-  end
-  
-  def initialize_last_tweets
-    self.last_tweet1 = get_last_tweet1
-    self.last_tweet2 = get_last_tweet2
-    self.save!
-  end
-  
-  def term1_timeline
-    begin
-      client = get_twitter_client
-      max_results = self.race_to - count1
-      Twitter::Search.new(self.term1).since(self.last_tweet1).per_page(max_results).page(1).fetch().results
-    rescue Twitter::TwitterError => e
-      nil
-    end
-  end
-  def term2_timeline
-    begin
-      client = get_twitter_client
-      max_results = self.race_to - count2
-      Twitter::Search.new(self.term2).since(self.last_tweet2).per_page(max_results).page(1).fetch().results
-    rescue Twitter::TwitterError => e
-      nil
     end
   end
   
