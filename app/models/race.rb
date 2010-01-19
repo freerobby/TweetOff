@@ -77,9 +77,9 @@ class Race < ActiveRecord::Base
     if winner == 0
       "It's a draw! \"" + self.term1 + "\" and \"" + self.term2 + "\" both got " + count1.to_s + " mentions in " + (distance_of_time_in_words duration) + ". " + link_to_show + at_reply
     elsif winner == 1
-      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions and bested " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". " + link_to_show + at_reply
+      "In " + (distance_of_time_in_words duration) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions, beating " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". " + link_to_show + at_reply
     else # winner == 2
-      "In a span of " + (distance_of_time_in_words duration) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions and bested " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". " + link_to_show + at_reply
+      "In " + (distance_of_time_in_words duration) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions, beating " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". " + link_to_show + at_reply
     end
   end
   
