@@ -324,14 +324,14 @@ describe Race do
           @race.stub!(:count1).and_return(10)
           @race.stub!(:count2).and_return(5)
           generated_status = @race.send(:generate_twitter_status)
-          generated_status.should include_text '"ipod" got 10 mentions, besting "iphone", which got 5'
+          generated_status.should match /ipod.*10.*iphone.*5/
           generated_status.should include_text "@user"
         end
-        it "should generate proplery on term2 winner" do
+        it "should generate properly on term2 winner" do
           @race.stub!(:count1).and_return(5)
           @race.stub!(:count2).and_return(10)
           generated_status = @race.send(:generate_twitter_status)
-          generated_status.should include_text '"iphone" got 10 mentions, besting "ipod", which got 5'
+          generated_status.should match /iphone.*10.*ipod.*5/
           generated_status.should include_text "@user"
         end
       end
@@ -352,14 +352,14 @@ describe Race do
           @race.stub!(:count1).and_return(10)
           @race.stub!(:count2).and_return(5)
           generated_status = @race.send(:generate_twitter_status)
-          generated_status.should include_text '"ipod" got 10 mentions, besting "iphone", which got 5'
+          generated_status.should match /ipod.*10.*iphone.*5/
           generated_status.should_not include_text "@"
         end
-        it "should generate proplery on term2 winner" do
+        it "should generate properly on term2 winner" do
           @race.stub!(:count1).and_return(5)
           @race.stub!(:count2).and_return(10)
           generated_status = @race.send(:generate_twitter_status)
-          generated_status.should include_text '"iphone" got 10 mentions, besting "ipod", which got 5'
+          generated_status.should match /iphone.*10.*ipod.*5/
           generated_status.should_not include_text "@"
         end
       end
