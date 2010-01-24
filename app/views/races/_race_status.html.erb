@@ -11,3 +11,11 @@
     race_finished = false;
   <% end %>
 </script>
+
+<% if @race.complete? %>
+  <script type="text/javascript">
+    <!-- Make one final update for the latest tweets. -->
+    <%= remote_function :url => latest_tweets_races_url(:id => @race.id, :term => 1), :update => "update_term1", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id1", :method => :get %>
+    <%= remote_function :url => latest_tweets_races_url(:id => @race.id, :term => 2), :update => "update_term2", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id2", :method => :get %>
+  </script>
+<% end %>
