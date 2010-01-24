@@ -12,13 +12,15 @@
 </div>
 
 <table id="races_table">
+<thead>
   <tr>
     <th colspan="3">Race</th>
     <th>Race To</th>
     <th>Began </th>
     <th>Duration</th>
   </tr>
-
+</thead>
+<tbody>  
 <% @races.each do |race| %>
 <%
   color1 = "black"
@@ -28,7 +30,7 @@
   color2 = "green" if race.winner == 2
   color2 = "orange" if race.winner == 0
 %>
-  <tr>
+  <tr onclick="javascript:location.href='<%= race_path race %>';">
     <div>
       <td align="right">
         <font color="<%= color1 %>">
@@ -67,7 +69,7 @@
         in progress
       <% end %>
     </td>
-    <td align="center"><%= link_to 'View', race %></td>
   </tr>
 <% end %>
+</tbody>
 </table>
