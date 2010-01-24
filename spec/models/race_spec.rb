@@ -132,13 +132,7 @@ describe Race do
         @twitter_vs_facebook.began_at.should == @twitter_vs_facebook.created_at
       end
     end
-    
-    describe "duration()" do
-      it "should be the time between the first tweet in the race and the last tweet in the race" do
-        @twitter_vs_facebook.duration.should be_close 19.seconds, 1.second
-      end
-    end
-  
+      
     describe "is_complete?()" do
       it "should be true if count1 >= race_to" do
         @twitter_vs_facebook.stub!(:count1).and_return(8)
@@ -304,13 +298,15 @@ describe Race do
         Race.any_instance.stubs(:update_status)
         # Assume we are not bailing due to hammering Twitter too much.
         Race.any_instance.stubs(:twitter_timeout_passed?).returns(true)
+        time = Time.now
+        Race.any_instance.stubs(:began_at).returns(time)
+        Race.any_instance.stubs(:ended_at).returns(time + 55.minutes)
       end
       describe "user-owned" do
         before do
           user = Factory.create :user, :login => "user", :twitter_id => "237237283"
           
           @race = Factory.create :race, :term1 => "ipod", :term2 => "iphone", :race_to => 10, :user => user
-          @race.stub!(:duration).and_return(1.hour)
           @race.stub!(:link_to_show).and_return("http://link.to/return")
         end
         it "should generate properly on draw" do
@@ -319,6 +315,7 @@ describe Race do
           generated_status = @race.send(:generate_twitter_status)
           generated_status.should include_text "It's a draw!"
           generated_status.should include_text "@user"
+          generated_status.should include_text "about 1 hour"
         end
         it "should generate properly on term1 winner" do
           @race.stub!(:count1).and_return(10)
@@ -326,6 +323,7 @@ describe Race do
           generated_status = @race.send(:generate_twitter_status)
           generated_status.should match /ipod.*10.*iphone.*5/
           generated_status.should include_text "@user"
+          generated_status.should include_text "about 1 hour"
         end
         it "should generate properly on term2 winner" do
           @race.stub!(:count1).and_return(5)
@@ -333,6 +331,7 @@ describe Race do
           generated_status = @race.send(:generate_twitter_status)
           generated_status.should match /iphone.*10.*ipod.*5/
           generated_status.should include_text "@user"
+          generated_status.should include_text "about 1 hour"
         end
       end
       describe "anonymous" do
@@ -347,6 +346,7 @@ describe Race do
           generated_status = @race.send(:generate_twitter_status)
           generated_status.should include_text "It's a draw!"
           generated_status.should_not include_text "@"
+          generated_status.should include_text "about 1 hour"
         end
         it "should generate properly on term1 winner" do
           @race.stub!(:count1).and_return(10)
@@ -354,6 +354,7 @@ describe Race do
           generated_status = @race.send(:generate_twitter_status)
           generated_status.should match /ipod.*10.*iphone.*5/
           generated_status.should_not include_text "@"
+          generated_status.should include_text "about 1 hour"
         end
         it "should generate properly on term2 winner" do
           @race.stub!(:count1).and_return(5)
@@ -361,6 +362,7 @@ describe Race do
           generated_status = @race.send(:generate_twitter_status)
           generated_status.should match /iphone.*10.*ipod.*5/
           generated_status.should_not include_text "@"
+          generated_status.should include_text "about 1 hour"
         end
       end
     end

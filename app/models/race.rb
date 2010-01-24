@@ -58,11 +58,7 @@ class Race < ActiveRecord::Base
     ts = self.twitter_tweets.all(:order => "tweeted_at DESC", :limit => 1).first
     ts.nil? ? self.updated_at : ts.tweeted_at
   end
-  
-  def duration
-    ended_at - began_at
-  end
-  
+    
   def twitter_timeout_passed?
     (Time.now > (self.updated_at + TWITTER_REFRESH_INTERVAL))
   end
@@ -75,11 +71,11 @@ class Race < ActiveRecord::Base
   def generate_twitter_status
     at_reply = self.user.nil? ? "" : " @" + self.user.login
     if winner == 0
-      "It's a draw! \"" + self.term1 + "\" and \"" + self.term2 + "\" both got " + count1.to_s + " mentions in " + (distance_of_time_in_words duration) + ". " + link_to_show + at_reply
+      "It's a draw! \"" + self.term1 + "\" and \"" + self.term2 + "\" both got " + count1.to_s + " mentions in " + (distance_of_time_in_words began_at, ended_at) + ". " + link_to_show + at_reply
     elsif winner == 1
-      "In " + (distance_of_time_in_words duration) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions, beating " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". " + link_to_show + at_reply
+      "In " + (distance_of_time_in_words began_at, ended_at) + ", " + "\"" + self.term1 + "\"" + " got " + self.count1.to_s + " mentions, beating " + "\"" + self.term2 + "\"" + ", which got " + self.count2.to_s + ". " + link_to_show + at_reply
     else # winner == 2
-      "In " + (distance_of_time_in_words duration) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions, beating " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". " + link_to_show + at_reply
+      "In " + (distance_of_time_in_words began_at, ended_at) + ", " + "\"" + self.term2 + "\"" + " got " + self.count2.to_s + " mentions, beating " + "\"" + self.term1 + "\"" + ", which got " + self.count1.to_s + ". " + link_to_show + at_reply
     end
   end
   
