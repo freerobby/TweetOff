@@ -1,6 +1,3 @@
-<%
-  last_twitter_id = 0 if last_twitter_id.nil?
-%>
 <% tweets.each do |t| %>
   <li>
     <a href="http://twitter.com/<%= t.author %>" target="_blank">
@@ -13,6 +10,10 @@
     <!-- (<%=h t.tweeted_at %>) -->
   </li>
 <% end %>
-<script type="text/javascript">
-  last_twitter_id = <%= last_twitter_id %>;
-</script>
+<% unless tweets.empty? %>
+  <script type="text/javascript">
+    //<![CDATA[
+      last_twitter_id<%= term %> = <%= tweets.last.twitter_id %>;
+    //]]>
+  </script>
+<% end %>

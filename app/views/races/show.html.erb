@@ -1,3 +1,8 @@
+<script type="text/javascript">
+  last_twitter_id1 = 0;
+  last_twitter_id2 = 0;
+</script>
+
 <div id="race_status">
   <%= render :partial => "race_status" %>
 </div>
@@ -38,19 +43,23 @@
 </script>
 
 <!-- Grab latest tweets for term 1. -->
-<%= periodically_call_remote :url => latest_tweets_races_url(:id => @race.id, :term => 1), :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "update_term1", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id", :method => :get %>
+<%= periodically_call_remote :url => latest_tweets_races_url(:id => @race.id, :term => 1), :frequency => (TWITTER_REFRESH_INTERVAL+2), :update => "update_term1", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id1", :method => :get %>
 
 <!-- Grab latest tweets for term 2. -->
-<%= periodically_call_remote :url => latest_tweets_races_url(:id => @race.id, :term => 2), :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "update_term2", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id", :method => :get %>
+<%= periodically_call_remote :url => latest_tweets_races_url(:id => @race.id, :term => 2), :frequency => (TWITTER_REFRESH_INTERVAL+2), :update => "update_term2", :condition => "race_finished == false", :position => "bottom", :with => "'last_twitter_id=' + last_twitter_id2", :method => :get %>
 
 <!-- Update the status of query 1 -->
-<%= periodically_call_remote :url => update_query_status_races_url(:id => @race.id, :term => 1), :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "query1_status", :condition => "race_finished == false", :method => :get %>
+<%= periodically_call_remote :url => update_query_status_races_url(:id => @race.id, :term => 1), :frequency => (TWITTER_REFRESH_INTERVAL+2), :update => "query1_status", :condition => "race_finished == false", :method => :get %>
 
 <!-- Update the status of query 2 -->
-<%= periodically_call_remote :url => update_query_status_races_url(:id => @race.id, :term => 2), :frequency => ((TWITTER_REFRESH_INTERVAL+1)/2), :update => "query2_status", :condition => "race_finished == false", :method => :get %>
+<%= periodically_call_remote :url => update_query_status_races_url(:id => @race.id, :term => 2), :frequency => (TWITTER_REFRESH_INTERVAL+2), :update => "query2_status", :condition => "race_finished == false", :method => :get %>
 
 <!-- Update the race status -->
-<%= periodically_call_remote :url => update_race_status_races_url(:id => @race.id), :frequency => (TWITTER_REFRESH_INTERVAL+1), :update => "race_status", :condition => "race_finished == false", :method => :get %>
+<%= periodically_call_remote :url => update_race_status_races_url(:id => @race.id), :frequency => (TWITTER_REFRESH_INTERVAL+2), :update => "race_status", :condition => "race_finished == false", :method => :get %>
 
 <!-- Re-query from twitter. -->
-<%= periodically_call_remote :url => refresh_status_races_url(:id => @race.id), :frequency => "5", :condition => "race_finished == false", :method => :post %>
+<%#
+# The following div is needed for periodically_call_remote in jrails because jquery appends the "#" to the update div, so a blank entry amounts to a div of null ID which is not valid."
+#%>
+<div id="empty1" style="display: none;"></div>
+<%= periodically_call_remote :url => refresh_status_races_url(:id => @race.id), :frequency => (TWITTER_REFRESH_INTERVAL + 1), :condition => "race_finished == false", :method => :post, :update => "empty1" %>
