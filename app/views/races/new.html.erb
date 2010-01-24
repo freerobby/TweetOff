@@ -1,3 +1,12 @@
+<script type="text/javascript">
+  field_to_update = "#race_term1";
+  
+  function update(val) {
+    $(field_to_update).attr('value', val);
+    field_to_update = (field_to_update == "#race_term1") ? "#race_term2" : "#race_term1"
+  }
+</script>
+
 <table align="center">
   <tr>
     <td valign="top" width="50%">
@@ -30,7 +39,7 @@
       <ul>
         <% TwitterTrends::current.each do |trend| %>
         <li>
-          <%=h trend %>
+          <a style="cursor: pointer;" onclick="update('<%=h trend %>');"><%=h trend %></a>
         </li>
         <% end %>
       </ul>
