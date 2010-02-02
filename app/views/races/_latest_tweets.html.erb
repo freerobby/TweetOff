@@ -5,7 +5,7 @@
         @<%= t.author %>
       </b>
     </a>:
-    <%= t.text %>
+    <%= auto_link t.text, :all, :target => '_blank' %>
     [<a href="http://twitter.com/<%= t.author %>/status/<%= t.twitter_id %>" target="_blank">link</a>]
     <!-- (<%=h t.tweeted_at %>) -->
   </li>
